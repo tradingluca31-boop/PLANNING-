@@ -180,7 +180,7 @@ st.markdown("""
 
     /* Calendar day */
     .calendar-day {
-        background: white;
+        background: linear-gradient(135deg, rgba(248,250,252,0.95), rgba(226,232,240,0.9));
         border-radius: 12px;
         padding: 10px;
         text-align: center;
@@ -262,7 +262,7 @@ st.markdown("""
     }
 
     .week-body {
-        background: white;
+        background: linear-gradient(135deg, rgba(248,250,252,0.95), rgba(226,232,240,0.9));
         padding: 15px;
         border-radius: 0 0 12px 12px;
         min-height: 200px;
@@ -679,7 +679,7 @@ with tab_monthly:
                         """, unsafe_allow_html=True)
                     elif total > 0:
                         st.markdown(f"""
-                        <div style="background: rgba(255,255,255,0.05);
+                        <div style="background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08));
                                     border-radius: 10px; padding: 10px; text-align: center; min-height: 60px;">
                             <strong>{day}</strong><br>
                             <span style="font-size: 0.8rem; color: #7c3aed;">{total} items</span>
@@ -687,7 +687,7 @@ with tab_monthly:
                         """, unsafe_allow_html=True)
                     else:
                         st.markdown(f"""
-                        <div style="background: rgba(255,255,255,0.02);
+                        <div style="background: linear-gradient(135deg, rgba(99,102,241,0.05), rgba(139,92,246,0.03));
                                     border-radius: 10px; padding: 10px; text-align: center; min-height: 60px;">
                             {day}
                         </div>
