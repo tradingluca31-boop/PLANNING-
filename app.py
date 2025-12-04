@@ -451,21 +451,21 @@ with tab_daily:
                     with col_content:
                         if task.get("completed", False):
                             st.markdown(f"""
-                            <div style="opacity: 0.5; padding: 8px 0;">
-                                <span style="text-decoration: line-through;">{cat['icon']} {prio['icon']} {task['task']}</span>
-                                <span style="color: #94a3b8; font-size: 0.85rem; margin-left: 10px;">⏱️ {time_est}</span>
+                            <div style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.08)); border-radius: 10px; padding: 10px 14px; opacity: 0.6;">
+                                <span style="text-decoration: line-through; color: #64748b;">{cat['icon']} {prio['icon']} {task['task']}</span>
+                                <span style="color: #94a3b8; font-size: 0.85rem; margin-left: 8px;">⏱️ {time_est}</span>
                             </div>
                             """, unsafe_allow_html=True)
                         else:
                             st.markdown(f"""
-                            <div style="padding: 8px 0;">
+                            <div style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.12)); border-radius: 10px; padding: 10px 14px; border-left: 3px solid {prio['color']};">
                                 <span>{cat['icon']} {prio['icon']} <strong>{task['task']}</strong></span>
-                                <span style="color: #6366f1; font-size: 0.85rem; margin-left: 10px;">⏱️ {time_est}</span>
+                                <span style="color: #6366f1; font-size: 0.85rem; margin-left: 8px;">⏱️ {time_est}</span>
                             </div>
                             """, unsafe_allow_html=True)
 
                     with col_del:
-                        if st.button("❌", key=f"del_task_{date_key}_{idx}"):
+                        if st.button("🗑️", key=f"del_task_{date_key}_{idx}", help="Supprimer"):
                             st.session_state.data["tasks"][date_key].pop(idx)
                             save_data(st.session_state.data)
                             st.rerun()
