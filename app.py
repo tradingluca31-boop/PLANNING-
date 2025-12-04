@@ -626,7 +626,6 @@ with tab_weekly:
                         """, unsafe_allow_html=True)
 
                 with col_d:
-                    st.write("")
                     if st.button("🗑️", key=f"del_wg_{week_key}_{idx}", help="Supprimer"):
                         st.session_state.data["weekly_goals"][week_key].pop(idx)
                         save_data(st.session_state.data)
@@ -770,7 +769,6 @@ with tab_monthly:
                         save_data(st.session_state.data)
 
                 with col_d:
-                    st.write("")
                     if st.button("🗑️", key=f"del_mo_{month_key}_{idx}", help="Supprimer"):
                         st.session_state.data["monthly_goals"][month_key].pop(idx)
                         save_data(st.session_state.data)
@@ -902,7 +900,6 @@ with tab_quarterly:
                         """, unsafe_allow_html=True)
 
                 with col_d:
-                    st.write("")
                     if st.button("🗑️", key=f"del_qg_{quarter_key}_{idx}", help="Supprimer"):
                         st.session_state.data["quarterly_vision"][quarter_key]["goals"].pop(idx)
                         save_data(st.session_state.data)
