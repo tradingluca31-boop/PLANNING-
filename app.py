@@ -439,7 +439,7 @@ with tab_daily:
 
                 # Card style pour chaque tâche
                 with st.container():
-                    col_check, col_content, col_del = st.columns([0.3, 5.4, 0.3])
+                    col_check, col_content, col_del = st.columns([0.5, 5, 0.5])
 
                     with col_check:
                         new_state = st.checkbox("", value=task.get("completed", False), key=f"task_{date_key}_{idx}", label_visibility="collapsed")
@@ -465,6 +465,7 @@ with tab_daily:
                             """, unsafe_allow_html=True)
 
                     with col_del:
+                        st.write("")
                         if st.button("🗑️", key=f"del_task_{date_key}_{idx}", help="Supprimer"):
                             st.session_state.data["tasks"][date_key].pop(idx)
                             save_data(st.session_state.data)
