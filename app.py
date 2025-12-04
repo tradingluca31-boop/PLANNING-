@@ -509,7 +509,7 @@ with tab_daily:
             else:
                 # Créneau libre - formulaire simplifié
                 with st.form(key=f"slot_{date_key}_{hour}", clear_on_submit=True):
-                    col_time, col_input, col_cat, col_btn = st.columns([0.7, 3.3, 1.3, 0.7])
+                    col_time, col_input, col_cat, col_btn = st.columns([0.6, 2.5, 2.2, 0.7])
 
                     with col_time:
                         st.markdown(f"**{hour_str}**")
@@ -527,7 +527,7 @@ with tab_daily:
                             "c",
                             list(CATEGORIES.keys()),
                             key=f"qc_{date_key}_{hour}",
-                            format_func=lambda x: f"{CATEGORIES[x]['icon']}",
+                            format_func=lambda x: f"{CATEGORIES[x]['icon']} {x}",
                             label_visibility="collapsed"
                         )
 
