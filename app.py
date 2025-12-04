@@ -507,49 +507,39 @@ with tab_daily:
                                 save_data(st.session_state.data)
                                 st.rerun()
             else:
-                # Créneau libre - avec bouton pour ajouter
-                col_time, col_free, col_add = st.columns([1, 4, 1])
-                with col_time:
-                    st.markdown(f"**{hour_str}**")
-                with col_free:
-                    # Zone de texte rapide pour ce créneau
-                    quick_input = st.text_input(
-                        f"Activité {hour_str}",
-                        key=f"quick_{date_key}_{hour}",
-                        placeholder="Écrire une activité...",
-                        label_visibility="collapsed"
-                    )
-                with col_add:
-                    with st.popover("⚙️"):
-                        st.markdown("**Détails**")
+                # Créneau libre - formulaire simplifié
+                with st.form(key=f"slot_{date_key}_{hour}", clear_on_submit=True):
+                    col_time, col_input, col_cat, col_btn = st.columns([0.7, 3.3, 1.3, 0.7])
+
+                    with col_time:
+                        st.markdown(f"**{hour_str}**")
+
+                    with col_input:
+                        quick_input = st.text_input(
+                            "t",
+                            key=f"qi_{date_key}_{hour}",
+                            placeholder="Écrire une tâche...",
+                            label_visibility="collapsed"
+                        )
+
+                    with col_cat:
                         quick_cat = st.selectbox(
-                            "Catégorie",
+                            "c",
                             list(CATEGORIES.keys()),
-                            key=f"qcat_{date_key}_{hour}",
-                            format_func=lambda x: f"{CATEGORIES[x]['icon']} {x}"
+                            key=f"qc_{date_key}_{hour}",
+                            format_func=lambda x: f"{CATEGORIES[x]['icon']}",
+                            label_visibility="collapsed"
                         )
-                        quick_prio = st.selectbox(
-                            "Priorité",
-                            list(PRIORITIES.keys()),
-                            index=2,
-                            key=f"qprio_{date_key}_{hour}",
-                            format_func=lambda x: f"{PRIORITIES[x]['icon']} {x}"
-                        )
-                        quick_end = st.selectbox(
-                            "Durée",
-                            [1, 2, 3, 4, 5, 6, 7, 8],
-                            key=f"qdur_{date_key}_{hour}",
-                            format_func=lambda x: f"{x}h"
-                        )
-                        if st.button("✅ Ajouter", key=f"qadd_{date_key}_{hour}", use_container_width=True):
+
+                    with col_btn:
+                        if st.form_submit_button("➕"):
                             if quick_input:
-                                end_h = min(hour + quick_end, 24)
-                                block_key = f"{hour:02d}:00-{end_h:02d}:00"
+                                block_key = f"{hour:02d}:00-{hour+1:02d}:00"
                                 st.session_state.data["planning"][date_key][block_key] = {
                                     "start": hour,
-                                    "end": end_h,
+                                    "end": hour + 1,
                                     "category": quick_cat,
-                                    "priority": quick_prio,
+                                    "priority": "Moyenne",
                                     "description": quick_input,
                                     "completed": False
                                 }
