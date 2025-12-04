@@ -377,237 +377,112 @@ with tab_daily:
 
     st.markdown("---")
 
-    # Layout principal
-    col_planning, col_tasks = st.columns([3, 1])
+    # Initialiser les tâches du jour
+    if date_key not in st.session_state.data["tasks"]:
+        st.session_state.data["tasks"][date_key] = []
 
-    with col_planning:
-        st.markdown("### ⏰ Planning de la Journée")
+    # Formulaire d'ajout de tâche
+    st.markdown("### ➕ Ajouter une tâche")
 
-        # Initialiser le planning
-        if date_key not in st.session_state.data["planning"]:
-            st.session_state.data["planning"][date_key] = {}
+    with st.form("add_daily_task", clear_on_submit=True):
+        col_input, col_cat, col_prio, col_btn = st.columns([3, 2, 1.5, 0.8])
 
-        # Formulaire d'ajout de bloc horaire
-        with st.expander("➕ **AJOUTER UN BLOC HORAIRE**", expanded=False):
-            st.markdown("*Sélectionnez une plage horaire pour planifier une activité*")
+        with col_input:
+            task_input = st.text_input(
+                "Tâche",
+                placeholder="Écrire une tâche...",
+                label_visibility="collapsed"
+            )
 
-            col1, col2 = st.columns(2)
-            with col1:
-                start_hour = st.selectbox(
-                    "⏰ Heure de début",
-                    options=list(range(24)),
-                    format_func=lambda x: f"{x:02d}:00",
-                    index=8
-                )
-            with col2:
-                end_hour = st.selectbox(
-                    "⏰ Heure de fin",
-                    options=list(range(24)),
-                    format_func=lambda x: f"{x:02d}:00",
-                    index=9
-                )
+        with col_cat:
+            task_cat = st.selectbox(
+                "Catégorie",
+                list(CATEGORIES.keys()),
+                format_func=lambda x: f"{CATEGORIES[x]['icon']} {x}",
+                label_visibility="collapsed"
+            )
 
-            if end_hour <= start_hour:
-                st.warning("⚠️ L'heure de fin doit être après l'heure de début")
+        with col_prio:
+            task_prio = st.selectbox(
+                "Priorité",
+                list(PRIORITIES.keys()),
+                index=2,
+                format_func=lambda x: f"{PRIORITIES[x]['icon']} {x}",
+                label_visibility="collapsed"
+            )
 
-            col3, col4 = st.columns(2)
-            with col3:
-                category = st.selectbox(
-                    "📁 Catégorie",
-                    options=list(CATEGORIES.keys()),
-                    format_func=lambda x: f"{CATEGORIES[x]['icon']} {x}"
-                )
-            with col4:
-                priority = st.selectbox(
-                    "🎯 Priorité",
-                    options=list(PRIORITIES.keys()),
-                    format_func=lambda x: f"{PRIORITIES[x]['icon']} {x}"
-                )
-
-            description = st.text_input("📝 Description de l'activité")
-
-            if st.button("✅ Ajouter au Planning", use_container_width=True, type="primary"):
-                if description and end_hour > start_hour:
-                    block_key = f"{start_hour:02d}:00-{end_hour:02d}:00"
-                    st.session_state.data["planning"][date_key][block_key] = {
-                        "start": start_hour,
-                        "end": end_hour,
-                        "category": category,
-                        "priority": priority,
-                        "description": description,
-                        "completed": False
-                    }
-                    save_data(st.session_state.data)
-                    st.success(f"✅ Bloc {block_key} ajouté!")
-                    st.rerun()
-
-        # Affichage du planning
-        st.markdown("---")
-
-        planning = st.session_state.data["planning"].get(date_key, {})
-
-        # Créer une grille horaire
-        for hour in range(6, 24):  # De 6h à 23h
-            hour_str = f"{hour:02d}:00"
-            next_hour_str = f"{hour+1:02d}:00"
-
-            # Chercher si un bloc couvre cette heure
-            block_found = None
-            for block_key, block in planning.items():
-                if block["start"] <= hour < block["end"]:
-                    block_found = (block_key, block)
-                    break
-
-            if block_found:
-                block_key, block = block_found
-                # N'afficher que la première heure du bloc
-                if block["start"] == hour:
-                    cat = CATEGORIES[block["category"]]
-                    prio = PRIORITIES[block["priority"]]
-                    duration = block["end"] - block["start"]
-
-                    col_time, col_block, col_actions = st.columns([1, 4, 1])
-
-                    with col_time:
-                        st.markdown(f"**{hour_str}**")
-                        st.caption(f"↓ {block['end']:02d}:00")
-
-                    with col_block:
-                        status_icon = "✅" if block["completed"] else ""
-                        text_style = "~~" if block["completed"] else ""
-
-                        st.markdown(f"""
-                        <div style="
-                            background: linear-gradient(135deg, {cat['color']}33, {cat['color']}11);
-                            border-left: 4px solid {cat['color']};
-                            border-radius: 12px;
-                            padding: 15px;
-                            margin: 5px 0;
-                        ">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-size: 1.2rem;">{cat['icon']} {prio['icon']} <strong>{text_style}{block['description']}{text_style}</strong> {status_icon}</span>
-                                <span style="color: {cat['color']}; font-weight: 600;">{duration}h</span>
-                            </div>
-                            <div style="color: #94a3b8; font-size: 0.9rem; margin-top: 5px;">
-                                {block['category']} • {hour_str} - {block['end']:02d}:00
-                            </div>
-                        </div>
-                        """, unsafe_allow_html=True)
-
-                    with col_actions:
-                        col_a, col_b = st.columns(2)
-                        with col_a:
-                            if st.button("✓" if not block["completed"] else "↩️", key=f"toggle_{date_key}_{block_key}"):
-                                st.session_state.data["planning"][date_key][block_key]["completed"] = not block["completed"]
-                                save_data(st.session_state.data)
-                                st.rerun()
-                        with col_b:
-                            if st.button("🗑️", key=f"del_{date_key}_{block_key}"):
-                                del st.session_state.data["planning"][date_key][block_key]
-                                save_data(st.session_state.data)
-                                st.rerun()
-            else:
-                # Créneau libre - formulaire simplifié
-                with st.form(key=f"slot_{date_key}_{hour}", clear_on_submit=True):
-                    col_time, col_input, col_cat, col_btn = st.columns([0.6, 2.5, 2.2, 0.7])
-
-                    with col_time:
-                        st.markdown(f"**{hour_str}**")
-
-                    with col_input:
-                        quick_input = st.text_input(
-                            "t",
-                            key=f"qi_{date_key}_{hour}",
-                            placeholder="Écrire une tâche...",
-                            label_visibility="collapsed"
-                        )
-
-                    with col_cat:
-                        quick_cat = st.selectbox(
-                            "c",
-                            list(CATEGORIES.keys()),
-                            key=f"qc_{date_key}_{hour}",
-                            format_func=lambda x: f"{CATEGORIES[x]['icon']} {x}",
-                            label_visibility="collapsed"
-                        )
-
-                    with col_btn:
-                        if st.form_submit_button("➕"):
-                            if quick_input:
-                                block_key = f"{hour:02d}:00-{hour+1:02d}:00"
-                                st.session_state.data["planning"][date_key][block_key] = {
-                                    "start": hour,
-                                    "end": hour + 1,
-                                    "category": quick_cat,
-                                    "priority": "Moyenne",
-                                    "description": quick_input,
-                                    "completed": False
-                                }
-                                save_data(st.session_state.data)
-                                st.rerun()
-
-    with col_tasks:
-        st.markdown("### ✅ Tâches")
-
-        if date_key not in st.session_state.data["tasks"]:
-            st.session_state.data["tasks"][date_key] = []
-
-        # Ajouter une tâche
-        with st.form("quick_task", clear_on_submit=True):
-            task_input = st.text_input("Nouvelle tâche", placeholder="Ex: Appeler le client...")
-            task_prio = st.selectbox("Priorité", list(PRIORITIES.keys()), key="qp")
-
-            if st.form_submit_button("➕ Ajouter", use_container_width=True):
+        with col_btn:
+            if st.form_submit_button("➕"):
                 if task_input:
                     st.session_state.data["tasks"][date_key].append({
                         "task": task_input,
+                        "category": task_cat,
                         "priority": task_prio,
                         "completed": False
                     })
                     save_data(st.session_state.data)
                     st.rerun()
 
-        # Liste des tâches
-        tasks = st.session_state.data["tasks"].get(date_key, [])
+    st.markdown("---")
 
-        if tasks:
-            priority_order = {"Urgent": 0, "Haute": 1, "Moyenne": 2, "Basse": 3}
-            sorted_tasks = sorted(enumerate(tasks), key=lambda x: (x[1]["completed"], priority_order[x[1]["priority"]]))
+    # Liste des tâches du jour
+    st.markdown("### 📋 Tâches du jour")
 
-            for idx, task in sorted_tasks:
-                prio = PRIORITIES[task["priority"]]
+    tasks = st.session_state.data["tasks"].get(date_key, [])
 
-                col_c, col_t = st.columns([0.3, 0.7])
+    if not tasks:
+        st.info("Aucune tâche pour cette journée. Ajoutez-en une ci-dessus!")
+    else:
+        # Trier par priorité puis par statut
+        priority_order = {"Urgent": 0, "Haute": 1, "Moyenne": 2, "Basse": 3}
+        sorted_tasks = sorted(enumerate(tasks), key=lambda x: (x[1].get("completed", False), priority_order[x[1]["priority"]]))
 
-                with col_c:
-                    new_state = st.checkbox("", value=task["completed"], key=f"task_{date_key}_{idx}", label_visibility="collapsed")
-                    if new_state != task["completed"]:
-                        st.session_state.data["tasks"][date_key][idx]["completed"] = new_state
-                        save_data(st.session_state.data)
-                        st.rerun()
+        for idx, task in sorted_tasks:
+            prio = PRIORITIES[task["priority"]]
+            cat = CATEGORIES.get(task.get("category", "Autre"), CATEGORIES["Autre"])
 
-                with col_t:
-                    text_style = "~~" if task["completed"] else ""
-                    opacity = "0.5" if task["completed"] else "1"
-                    st.markdown(f"<span style='opacity: {opacity};'>{prio['icon']} {text_style}{task['task']}{text_style}</span>", unsafe_allow_html=True)
+            col_check, col_task, col_cat_icon, col_del = st.columns([0.5, 4, 1, 0.5])
 
-        else:
-            st.info("Aucune tâche")
+            with col_check:
+                new_state = st.checkbox("", value=task.get("completed", False), key=f"task_{date_key}_{idx}", label_visibility="collapsed")
+                if new_state != task.get("completed", False):
+                    st.session_state.data["tasks"][date_key][idx]["completed"] = new_state
+                    save_data(st.session_state.data)
+                    st.rerun()
 
-        # Stats
-        st.markdown("---")
-        st.markdown("### 📊 Stats")
+            with col_task:
+                if task.get("completed", False):
+                    st.markdown(f"<span style='opacity: 0.5; text-decoration: line-through;'>{prio['icon']} {task['task']}</span>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"{prio['icon']} **{task['task']}**")
 
-        all_items = list(planning.values()) + tasks
-        total = len(all_items)
-        completed = sum(1 for item in all_items if item.get("completed", False))
+            with col_cat_icon:
+                st.markdown(f"{cat['icon']} {task.get('category', 'Autre')}")
 
-        if total > 0:
-            pct = completed / total
-            st.progress(pct)
-            st.markdown(f"**{completed}/{total}** complétés ({pct*100:.0f}%)")
-        else:
-            st.caption("Aucune activité")
+            with col_del:
+                if st.button("🗑️", key=f"del_task_{date_key}_{idx}"):
+                    st.session_state.data["tasks"][date_key].pop(idx)
+                    save_data(st.session_state.data)
+                    st.rerun()
+
+    # Stats du jour
+    st.markdown("---")
+    st.markdown("### 📊 Progression")
+
+    total = len(tasks)
+    completed = sum(1 for t in tasks if t.get("completed", False))
+
+    if total > 0:
+        pct = completed / total
+        st.progress(pct)
+        st.markdown(f"**{completed}/{total}** tâches complétées ({pct*100:.0f}%)")
+
+        # Compteur par priorité
+        urgent_pending = sum(1 for t in tasks if t["priority"] == "Urgent" and not t.get("completed", False))
+        if urgent_pending > 0:
+            st.error(f"🔴 {urgent_pending} tâche(s) urgente(s) en attente!")
+    else:
+        st.caption("Ajoutez des tâches pour voir votre progression")
 
 # ==================== ONGLET HEBDOMADAIRE ====================
 with tab_weekly:
