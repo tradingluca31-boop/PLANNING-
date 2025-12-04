@@ -381,108 +381,112 @@ with tab_daily:
     if date_key not in st.session_state.data["tasks"]:
         st.session_state.data["tasks"][date_key] = []
 
-    # Formulaire d'ajout de tâche
-    st.markdown("### ➕ Ajouter une tâche")
+    # Section Tâches de la Journée
+    st.markdown("### 🎯 Tâches de la Journée")
 
-    with st.form("add_daily_task", clear_on_submit=True):
-        col_input, col_cat, col_prio, col_btn = st.columns([3, 2, 1.5, 0.8])
+    col_form, col_list = st.columns([1, 2])
 
-        with col_input:
-            task_input = st.text_input(
-                "Tâche",
-                placeholder="Écrire une tâche...",
-                label_visibility="collapsed"
+    with col_form:
+        with st.form("add_daily_task", clear_on_submit=True):
+            task_input = st.text_area("Nouvelle tâche", height=100, placeholder="Écrire une tâche...")
+
+            col_a, col_b = st.columns(2)
+            with col_a:
+                task_cat = st.selectbox(
+                    "Catégorie",
+                    list(CATEGORIES.keys()),
+                    format_func=lambda x: f"{CATEGORIES[x]['icon']} {x}"
+                )
+            with col_b:
+                task_prio = st.selectbox(
+                    "Priorité",
+                    list(PRIORITIES.keys()),
+                    format_func=lambda x: f"{PRIORITIES[x]['icon']} {x}"
+                )
+
+            task_time = st.selectbox(
+                "⏱️ Temps estimé",
+                ["15 min", "30 min", "45 min", "1h", "1h30", "2h", "3h", "4h", "Demi-journée", "Journée"],
+                index=3
             )
 
-        with col_cat:
-            task_cat = st.selectbox(
-                "Catégorie",
-                list(CATEGORIES.keys()),
-                format_func=lambda x: f"{CATEGORIES[x]['icon']} {x}",
-                label_visibility="collapsed"
-            )
-
-        with col_prio:
-            task_prio = st.selectbox(
-                "Priorité",
-                list(PRIORITIES.keys()),
-                index=2,
-                format_func=lambda x: f"{PRIORITIES[x]['icon']} {x}",
-                label_visibility="collapsed"
-            )
-
-        with col_btn:
-            if st.form_submit_button("➕"):
+            if st.form_submit_button("➕ Ajouter", use_container_width=True):
                 if task_input:
                     st.session_state.data["tasks"][date_key].append({
                         "task": task_input,
                         "category": task_cat,
                         "priority": task_prio,
+                        "time": task_time,
                         "completed": False
                     })
                     save_data(st.session_state.data)
                     st.rerun()
 
-    st.markdown("---")
+    with col_list:
+        tasks = st.session_state.data["tasks"].get(date_key, [])
 
-    # Liste des tâches du jour
-    st.markdown("### 📋 Tâches du jour")
+        if not tasks:
+            st.info("Aucune tâche pour cette journée")
+        else:
+            # Trier par priorité puis par statut
+            priority_order = {"Urgent": 0, "Haute": 1, "Moyenne": 2, "Basse": 3}
+            sorted_tasks = sorted(enumerate(tasks), key=lambda x: (x[1].get("completed", False), priority_order[x[1]["priority"]]))
 
-    tasks = st.session_state.data["tasks"].get(date_key, [])
+            for idx, task in sorted_tasks:
+                prio = PRIORITIES[task["priority"]]
+                cat = CATEGORIES.get(task.get("category", "Autre"), CATEGORIES["Autre"])
+                time_est = task.get("time", "1h")
 
-    if not tasks:
-        st.info("Aucune tâche pour cette journée. Ajoutez-en une ci-dessus!")
-    else:
-        # Trier par priorité puis par statut
-        priority_order = {"Urgent": 0, "Haute": 1, "Moyenne": 2, "Basse": 3}
-        sorted_tasks = sorted(enumerate(tasks), key=lambda x: (x[1].get("completed", False), priority_order[x[1]["priority"]]))
+                # Card style pour chaque tâche
+                with st.container():
+                    col_check, col_content, col_del = st.columns([0.3, 5.4, 0.3])
 
-        for idx, task in sorted_tasks:
-            prio = PRIORITIES[task["priority"]]
-            cat = CATEGORIES.get(task.get("category", "Autre"), CATEGORIES["Autre"])
+                    with col_check:
+                        new_state = st.checkbox("", value=task.get("completed", False), key=f"task_{date_key}_{idx}", label_visibility="collapsed")
+                        if new_state != task.get("completed", False):
+                            st.session_state.data["tasks"][date_key][idx]["completed"] = new_state
+                            save_data(st.session_state.data)
+                            st.rerun()
 
-            col_check, col_task, col_cat_icon, col_del = st.columns([0.5, 4, 1, 0.5])
+                    with col_content:
+                        if task.get("completed", False):
+                            st.markdown(f"""
+                            <div style="opacity: 0.5; padding: 8px 0;">
+                                <span style="text-decoration: line-through;">{cat['icon']} {prio['icon']} {task['task']}</span>
+                                <span style="color: #94a3b8; font-size: 0.85rem; margin-left: 10px;">⏱️ {time_est}</span>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        else:
+                            st.markdown(f"""
+                            <div style="padding: 8px 0;">
+                                <span>{cat['icon']} {prio['icon']} <strong>{task['task']}</strong></span>
+                                <span style="color: #6366f1; font-size: 0.85rem; margin-left: 10px;">⏱️ {time_est}</span>
+                            </div>
+                            """, unsafe_allow_html=True)
 
-            with col_check:
-                new_state = st.checkbox("", value=task.get("completed", False), key=f"task_{date_key}_{idx}", label_visibility="collapsed")
-                if new_state != task.get("completed", False):
-                    st.session_state.data["tasks"][date_key][idx]["completed"] = new_state
-                    save_data(st.session_state.data)
-                    st.rerun()
-
-            with col_task:
-                if task.get("completed", False):
-                    st.markdown(f"<span style='opacity: 0.5; text-decoration: line-through;'>{prio['icon']} {task['task']}</span>", unsafe_allow_html=True)
-                else:
-                    st.markdown(f"{prio['icon']} **{task['task']}**")
-
-            with col_cat_icon:
-                st.markdown(f"{cat['icon']} {task.get('category', 'Autre')}")
-
-            with col_del:
-                if st.button("🗑️", key=f"del_task_{date_key}_{idx}"):
-                    st.session_state.data["tasks"][date_key].pop(idx)
-                    save_data(st.session_state.data)
-                    st.rerun()
+                    with col_del:
+                        if st.button("❌", key=f"del_task_{date_key}_{idx}"):
+                            st.session_state.data["tasks"][date_key].pop(idx)
+                            save_data(st.session_state.data)
+                            st.rerun()
 
     # Stats du jour
     st.markdown("---")
-    st.markdown("### 📊 Progression")
-
+    tasks = st.session_state.data["tasks"].get(date_key, [])
     total = len(tasks)
     completed = sum(1 for t in tasks if t.get("completed", False))
 
     if total > 0:
-        pct = completed / total
-        st.progress(pct)
-        st.markdown(f"**{completed}/{total}** tâches complétées ({pct*100:.0f}%)")
+        col_prog, col_urgent = st.columns([3, 1])
+        with col_prog:
+            pct = completed / total
+            st.progress(pct)
+            st.caption(f"**{completed}/{total}** tâches complétées ({pct*100:.0f}%)")
 
-        # Compteur par priorité
-        urgent_pending = sum(1 for t in tasks if t["priority"] == "Urgent" and not t.get("completed", False))
-        if urgent_pending > 0:
-            st.error(f"🔴 {urgent_pending} tâche(s) urgente(s) en attente!")
-    else:
-        st.caption("Ajoutez des tâches pour voir votre progression")
+        with col_urgent:
+            urgent_pending = sum(1 for t in tasks if t["priority"] == "Urgent" and not t.get("completed", False))
+            if urgent_pending > 0:
+                st.error(f"🔴 {urgent_pending} urgente(s)!")
 
 # ==================== ONGLET HEBDOMADAIRE ====================
 with tab_weekly:
