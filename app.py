@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# CSS personnalisé ultra-moderne
+# CSS personnalisé - THEME CLAIR
 st.markdown("""
 <style>
     /* Import Google Fonts */
@@ -22,16 +22,16 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
     }
 
-    /* Fond principal */
+    /* Fond principal - CLAIR */
     .stApp {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
     }
 
     /* Header principal */
     .main-header {
         font-size: 3rem;
         font-weight: 700;
-        background: linear-gradient(120deg, #00d4ff, #7c3aed, #f472b6);
+        background: linear-gradient(120deg, #3b82f6, #8b5cf6, #ec4899);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
@@ -41,71 +41,72 @@ st.markdown("""
 
     .sub-header {
         text-align: center;
-        color: #94a3b8;
+        color: #64748b;
         font-size: 1.1rem;
         margin-bottom: 2rem;
     }
 
     /* Cards modernes */
     .glass-card {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(10px);
         border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
         padding: 20px;
         margin: 10px 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
 
     /* Créneaux horaires */
     .time-block {
-        background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(0, 212, 255, 0.1));
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(59, 130, 246, 0.1));
         border-radius: 12px;
         padding: 12px;
         margin: 4px 0;
-        border-left: 4px solid #7c3aed;
+        border-left: 4px solid #6366f1;
         transition: all 0.3s ease;
     }
 
     .time-block:hover {
         transform: translateX(5px);
-        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
     }
 
     .time-block-rest {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(147, 197, 253, 0.1));
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 197, 253, 0.1));
         border-left: 4px solid #3b82f6;
     }
 
     .time-block-work {
-        background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(134, 239, 172, 0.1));
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(134, 239, 172, 0.1));
         border-left: 4px solid #22c55e;
     }
 
     .time-block-urgent {
-        background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(252, 165, 165, 0.1));
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(252, 165, 165, 0.1));
         border-left: 4px solid #ef4444;
         animation: pulse-urgent 2s infinite;
     }
 
     @keyframes pulse-urgent {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-        50% { box-shadow: 0 0 20px 5px rgba(239, 68, 68, 0.2); }
+        0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
+        50% { box-shadow: 0 0 15px 3px rgba(239, 68, 68, 0.15); }
     }
 
     /* Time slot libre */
     .time-slot-free {
-        background: rgba(255, 255, 255, 0.02);
+        background: rgba(0, 0, 0, 0.02);
         border-radius: 8px;
         padding: 8px 12px;
         margin: 2px 0;
-        border: 1px dashed rgba(255, 255, 255, 0.1);
+        border: 1px dashed rgba(0, 0, 0, 0.15);
         color: #64748b;
         font-size: 0.9rem;
     }
 
     /* Stats cards */
     .stat-card {
-        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         border-radius: 16px;
         padding: 20px;
         text-align: center;
@@ -127,7 +128,7 @@ st.markdown("""
     /* Tabs styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(99, 102, 241, 0.1);
         padding: 8px;
         border-radius: 16px;
     }
@@ -136,18 +137,18 @@ st.markdown("""
         background-color: transparent;
         border-radius: 12px;
         padding: 12px 24px;
-        color: #94a3b8;
+        color: #475569;
         font-weight: 500;
     }
 
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #7c3aed, #a855f7) !important;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
         color: white !important;
     }
 
     /* Boutons */
     .stButton > button {
-        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         color: white;
         border: none;
         border-radius: 12px;
@@ -158,43 +159,44 @@ st.markdown("""
 
     .stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
     }
 
     /* Input fields */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background: white !important;
+        border: 1px solid #e2e8f0 !important;
         border-radius: 12px !important;
-        color: white !important;
+        color: #1e293b !important;
     }
 
     /* Progress bars */
     .stProgress > div > div > div {
-        background: linear-gradient(90deg, #7c3aed, #00d4ff);
+        background: linear-gradient(90deg, #6366f1, #3b82f6);
         border-radius: 10px;
     }
 
     /* Calendar day */
     .calendar-day {
-        background: rgba(255, 255, 255, 0.05);
+        background: white;
         border-radius: 12px;
         padding: 10px;
         text-align: center;
         min-height: 80px;
         transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .calendar-day:hover {
-        background: rgba(124, 58, 237, 0.2);
+        background: rgba(99, 102, 241, 0.1);
         transform: scale(1.02);
     }
 
     .calendar-day-today {
-        background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(0, 212, 255, 0.2));
-        border: 2px solid #7c3aed;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(59, 130, 246, 0.1));
+        border: 2px solid #6366f1;
     }
 
     .calendar-day-has-events {
@@ -209,38 +211,38 @@ st.markdown("""
         transform: translateX(-50%);
         width: 6px;
         height: 6px;
-        background: #7c3aed;
+        background: #6366f1;
         border-radius: 50%;
     }
 
-    /* Sidebar */
+    /* Sidebar - THEME CLAIR */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
     }
 
     /* Metrics */
     [data-testid="stMetricValue"] {
         font-size: 2rem;
         font-weight: 700;
-        color: #7c3aed;
+        color: #6366f1;
     }
 
     /* Dividers */
     hr {
         border: none;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.5), transparent);
+        background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
         margin: 20px 0;
     }
 
     /* Checkbox custom */
     .stCheckbox > label > span {
-        color: white !important;
+        color: #1e293b !important;
     }
 
     /* Activity block in calendar */
     .activity-block {
-        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
         color: white;
         padding: 8px 12px;
         border-radius: 8px;
@@ -251,19 +253,20 @@ st.markdown("""
 
     /* Week view */
     .week-header {
-        background: rgba(124, 58, 237, 0.2);
+        background: rgba(99, 102, 241, 0.15);
         padding: 15px;
         border-radius: 12px 12px 0 0;
         text-align: center;
         font-weight: 600;
-        color: #7c3aed;
+        color: #6366f1;
     }
 
     .week-body {
-        background: rgba(255, 255, 255, 0.03);
+        background: white;
         padding: 15px;
         border-radius: 0 0 12px 12px;
         min-height: 200px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 </style>
 """, unsafe_allow_html=True)
