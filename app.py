@@ -602,21 +602,32 @@ with tab_weekly:
             for idx, goal in enumerate(goals):
                 prio = PRIORITIES[goal["priority"]]
 
-                col_c, col_g, col_d = st.columns([0.5, 4, 0.5])
+                col_c, col_g, col_d = st.columns([0.5, 5, 0.5])
 
                 with col_c:
-                    new_state = st.checkbox("", value=goal["completed"], key=f"wg_{week_key}_{idx}")
+                    new_state = st.checkbox("", value=goal["completed"], key=f"wg_{week_key}_{idx}", label_visibility="collapsed")
                     if new_state != goal["completed"]:
                         st.session_state.data["weekly_goals"][week_key][idx]["completed"] = new_state
                         save_data(st.session_state.data)
                         st.rerun()
 
                 with col_g:
-                    style = "~~" if goal["completed"] else ""
-                    st.markdown(f"{prio['icon']} {style}{goal['goal']}{style}")
+                    if goal["completed"]:
+                        st.markdown(f"""
+                        <div style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.08)); border-radius: 10px; padding: 10px 14px; opacity: 0.6;">
+                            <span style="text-decoration: line-through; color: #64748b;">{prio['icon']} {goal['goal']}</span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"""
+                        <div style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.12)); border-radius: 10px; padding: 10px 14px; border-left: 3px solid {prio['color']};">
+                            <span>{prio['icon']} <strong>{goal['goal']}</strong></span>
+                        </div>
+                        """, unsafe_allow_html=True)
 
                 with col_d:
-                    if st.button("🗑️", key=f"del_wg_{week_key}_{idx}"):
+                    st.write("")
+                    if st.button("🗑️", key=f"del_wg_{week_key}_{idx}", help="Supprimer"):
                         st.session_state.data["weekly_goals"][week_key].pop(idx)
                         save_data(st.session_state.data)
                         st.rerun()
@@ -727,18 +738,28 @@ with tab_monthly:
             for idx, obj in enumerate(objectives):
                 prio = PRIORITIES[obj["priority"]]
 
-                col_c, col_o, col_p, col_d = st.columns([0.5, 3, 1.5, 0.5])
+                col_c, col_o, col_p, col_d = st.columns([0.5, 3.5, 1.5, 0.5])
 
                 with col_c:
-                    new_state = st.checkbox("", value=obj["completed"], key=f"mo_{month_key}_{idx}")
+                    new_state = st.checkbox("", value=obj["completed"], key=f"mo_{month_key}_{idx}", label_visibility="collapsed")
                     if new_state != obj["completed"]:
                         st.session_state.data["monthly_goals"][month_key][idx]["completed"] = new_state
                         save_data(st.session_state.data)
                         st.rerun()
 
                 with col_o:
-                    style = "~~" if obj["completed"] else ""
-                    st.markdown(f"{prio['icon']} {style}{obj['objective']}{style}")
+                    if obj["completed"]:
+                        st.markdown(f"""
+                        <div style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.08)); border-radius: 10px; padding: 10px 14px; opacity: 0.6;">
+                            <span style="text-decoration: line-through; color: #64748b;">{prio['icon']} {obj['objective']}</span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"""
+                        <div style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.12)); border-radius: 10px; padding: 10px 14px; border-left: 3px solid {prio['color']};">
+                            <span>{prio['icon']} <strong>{obj['objective']}</strong></span>
+                        </div>
+                        """, unsafe_allow_html=True)
 
                 with col_p:
                     prog = st.slider("", 0, 100, obj.get("progress", 0), key=f"prog_{month_key}_{idx}", label_visibility="collapsed")
@@ -749,7 +770,8 @@ with tab_monthly:
                         save_data(st.session_state.data)
 
                 with col_d:
-                    if st.button("🗑️", key=f"del_mo_{month_key}_{idx}"):
+                    st.write("")
+                    if st.button("🗑️", key=f"del_mo_{month_key}_{idx}", help="Supprimer"):
                         st.session_state.data["monthly_goals"][month_key].pop(idx)
                         save_data(st.session_state.data)
                         st.rerun()
@@ -856,22 +878,32 @@ with tab_quarterly:
                 prio = PRIORITIES[goal["priority"]]
                 cat = CATEGORIES[goal["category"]]
 
-                col_c, col_g, col_d = st.columns([0.5, 4.5, 0.5])
+                col_c, col_g, col_d = st.columns([0.5, 5, 0.5])
 
                 with col_c:
-                    new_state = st.checkbox("", value=goal["completed"], key=f"qg_{quarter_key}_{idx}")
+                    new_state = st.checkbox("", value=goal["completed"], key=f"qg_{quarter_key}_{idx}", label_visibility="collapsed")
                     if new_state != goal["completed"]:
                         st.session_state.data["quarterly_vision"][quarter_key]["goals"][idx]["completed"] = new_state
                         save_data(st.session_state.data)
                         st.rerun()
 
                 with col_g:
-                    style = "~~" if goal["completed"] else ""
-                    status = "✅" if goal["completed"] else ""
-                    st.markdown(f"{cat['icon']} {prio['icon']} {style}**{goal['goal']}**{style} {status}")
+                    if goal["completed"]:
+                        st.markdown(f"""
+                        <div style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.08)); border-radius: 10px; padding: 10px 14px; opacity: 0.6;">
+                            <span style="text-decoration: line-through; color: #64748b;">{cat['icon']} {prio['icon']} {goal['goal']} ✅</span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"""
+                        <div style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.12)); border-radius: 10px; padding: 10px 14px; border-left: 3px solid {prio['color']};">
+                            <span>{cat['icon']} {prio['icon']} <strong>{goal['goal']}</strong></span>
+                        </div>
+                        """, unsafe_allow_html=True)
 
                 with col_d:
-                    if st.button("🗑️", key=f"del_qg_{quarter_key}_{idx}"):
+                    st.write("")
+                    if st.button("🗑️", key=f"del_qg_{quarter_key}_{idx}", help="Supprimer"):
                         st.session_state.data["quarterly_vision"][quarter_key]["goals"].pop(idx)
                         save_data(st.session_state.data)
                         st.rerun()
